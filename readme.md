@@ -13,7 +13,7 @@ Use the ESP-12E WiFi module and the gyro sensor of your smartphone to control a 
 - Add ESPAsyncWebServer library: https://github.com/me-no-dev/ESPAsyncWebServer
 - Add ESPAsyncTCP library: https://github.com/me-no-dev/ESPAsyncTCP
 - Install the Arduino ESP8266 filesystem uploader to make use of SPIFFS filesystem (https://github.com/esp8266/arduino-esp8266fs-plugin)
-    - This plugin allows you to uplload html files directly to the ESP
+    - This plugin allows you to upload html files directly to the ESP
     - All files stored in the data subfolder of your Arduino sketch path will be uploaded   
 - Board Settings:
     - Board: "NodeMCU 1.0 (ESP-12E Module)"
