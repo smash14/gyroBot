@@ -4,6 +4,7 @@
 #include "ESPAsyncWebServer.h"
 #include "FS.h"   //Include File System Headers
 #include "SSD1306Spi.h"
+#include <Ticker.h>  //Ticker Library for timer Interrupt
 
 //Defines for H bridge
 #define enA 5
@@ -16,6 +17,9 @@
 //Defines for specific motor
 #define DEAD_BAND 500
 
+
+Ticker checkIPAddress;
+
 // Replace with your network credentials
 const char* ssid     = "ESP2";
 const char* password = "";
@@ -23,9 +27,12 @@ const char* password = "";
 bool accessPointMode = true;       //Use as a hotspot or connect to a local WiFi network
 
 const char* filename = "/index.html";
+const char* htmlRobotInUse = "/robotInUse.html";
 int angleX = 90;
 int angleY = 90;
 bool deviceIsConnected = false;
+String currentClientIPAddress;
+
 AsyncWebServer server(80);
 
 void setMotorSpeed(int leftMotor, int rightMotor) {
@@ -67,6 +74,16 @@ int angleToMotorSpeed (int angle) {
   }
   return motorSpeed;
 }
+
+void checkForIPAddress() {
+  if (currentClientIPAddress != "") {
+      Serial.println("Reset IP Address");
+    currentClientIPAddress = "";
+    angleX = 90;
+    angleY = 90;
+  }
+}
+
 
 void setup() {
   Serial.begin(115200);
@@ -129,30 +146,42 @@ void setup() {
   }
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
-    deviceIsConnected = true;
-    int paramsNr = request->params();
-    //Serial.println(paramsNr);
-    for (int i = 0; i < paramsNr; i++) {
-      AsyncWebParameter* p = request->getParam(i);
-      if (p->name() == "angleX") {
-        angleX = p->value().toInt();
-        //Serial.print("Angle x:");
-        //Serial.println(angleX);
-      } else if (p->name() == "angleY") {
-        angleY = p->value().toInt();
-        //Serial.print("Angle y:");
-        //Serial.println(angleY);
-      } else {
-        Serial.print("unknown name: ");
-        Serial.print(p->name());
-        Serial.print(", value to int: ");
-        Serial.println(p->value().toInt());
+    if (currentClientIPAddress == "" || currentClientIPAddress == request->client()->remoteIP().toString()) {
+      currentClientIPAddress = request->client()->remoteIP().toString();
+      checkIPAddress.detach(); //Disable Timer
+      deviceIsConnected = true;
+      int paramsNr = request->params();
+      //Serial.println(paramsNr);
+      for (int i = 0; i < paramsNr; i++) {
+        AsyncWebParameter* p = request->getParam(i);
+        if (p->name() == "angleX") {
+          angleX = p->value().toInt();
+          //Serial.print("Angle x:");
+          //Serial.println(angleX);
+        } else if (p->name() == "angleY") {
+          angleY = p->value().toInt();
+          //Serial.print("Angle y:");
+          //Serial.println(angleY);
+        } else {
+          Serial.print("unknown name: ");
+          Serial.print(p->name());
+          Serial.print(", value to int: ");
+          Serial.println(p->value().toInt());
+        }
       }
-    }
-    if (request -> params() == 0) {
-      request->send(SPIFFS, "/index.html");
+      if (request -> params() == 0) {
+        request->send(SPIFFS, "/index.html");
+      } else {
+        request -> send(200);
+      }
+
+      checkIPAddress.attach(2, checkForIPAddress); //Enable Timer again
     } else {
-      request -> send(200);
+      request->send(SPIFFS, "/robotInUse.html");
+        Serial.print("Declined Connection from: ");
+        Serial.print(request->client()->remoteIP().toString());
+        Serial.print(", The following device is already connected: ");
+        Serial.println(currentClientIPAddress);
     }
     //drawDirection();
   });

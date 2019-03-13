@@ -2,12 +2,42 @@
 <html>
 <head>
   <meta charset='utf-8'>
-  <!--<link href='https://developer.mozilla.org/static/build/styles/samples.37902ba3b7fe.css' rel='stylesheet' type='text/css' />-->
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
   <style type='text/css'> 
+  html, body {
+    overflow-x: hidden;
+  }
+
   body {
+  background-color: #353E4B;
+    position: relative;
     padding:0;
     margin:0
+       }
+       
+  h1 {
+    color: #AFC709;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: block;
+    font-size: 20vmin;
+    margin-top: 0em;
+    margin-bottom: 0.5em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+  }
+  
+  p {
+    color: #AFC709;
+    text-align: center;
+    display: block;
+    font-size: 8vmin;
+    margin-top: -0.3em;
+    margin-bottom: 2em;
+    margin-left: 0;
+    margin-right: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
   svg:not(:root){
     display:block
@@ -32,11 +62,13 @@
     padding:5px 10px 5px 26px
   }
   .garden {
-    position: relative;
-    width : 200px;
-    height: 200px;
-    border: 5px solid #CCC;
+    position: absolute;
+    border: 5px solid #A0AFFF;
     border-radius: 10px;
+    width:100%;
+    height:100%;
+    top:0px;
+    left: -5px;
   }
 
   .ball {
@@ -45,16 +77,33 @@
     left  : 90px;
     width : 20px;
     height: 20px;
-    background: green;
+    background: #AFC709;
     border-radius: 100%;
+  }
+  .garden-container{
+  	position: relative;
+  	width: 60%;		/* desired width */     
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .garden-container:before{
+  	content: "";
+  	display: block;
+  	padding-top: 100%; 	/* initial ratio of 1:1*/
   }
   </style>
 
-  <title>Detecting device orientation - Orientation_example - code sample</title>
+  <title>Be the Robot!</title>
 </head>
 <body>
-  <div class='garden'>
-    <div class='ball'></div>
+<h1>Be the Robot!</h1>
+<p>Gently move your device</p>
+  <div class='garden-container'>
+    <div class='garden'>
+      <div style="position:relative">
+        <div class='ball'></div>
+      </div>
+    </div>
   </div>
   <pre class='output'></pre>
   <script>
@@ -62,11 +111,11 @@
   var garden = document.querySelector('.garden');
   var output = document.querySelector('.output');
 
-  var lastSend = 0;
-  var maxX = garden.clientWidth  - ball.clientWidth;
-  var maxY = garden.clientHeight - ball.clientHeight;     
+  var lastSend = 0; 
 
   function handleOrientation(event) {
+    var maxX = garden.clientWidth  - ball.clientWidth;
+    var maxY = garden.clientHeight - ball.clientHeight; 
     var x = event.beta;  // In degree in the range [-180,180]
     var y = event.gamma; // In degree in the range [-90,90]
 
@@ -83,8 +132,8 @@
 
     // 10 is half the size of the ball
     // It center the positioning point to the center of the ball
-    ball.style.top  = (maxX*x/180 - 10) + 'px';
-    ball.style.left = (maxY*y/180 - 10) + 'px';
+    ball.style.top  = (maxX*x/180) + 'px';
+    ball.style.left = (maxY*y/180) + 'px';
 	
     if ((new Date()).getTime() - lastSend > 100) {
       lastSend = (new Date()).getTime();
