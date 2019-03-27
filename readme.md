@@ -1,4 +1,5 @@
 # GyroRobot
+UPDATE: Code not working with iOS 12.2: https://www.redmondpie.com/ios-12.2-will-prevent-motion-orientation-access-in-safari-unless-enabled/
 
 Use the ESP-12E WiFi module and the gyro sensor of your smartphone to control a robot
 
